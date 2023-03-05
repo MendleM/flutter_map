@@ -333,10 +333,6 @@ class PolylinePainter extends CustomPainter {
     final double normalizedDashWidth = dashWidth * strokeWidth;
     final double normalizedDashGap = dashGap * strokeWidth;
 
-    paint.strokeCap = StrokeCap.round;
-    paint.strokeJoin = StrokeJoin.miter;
-    paint.strokeWidth = 200;
-
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
@@ -345,7 +341,6 @@ class PolylinePainter extends CustomPainter {
 
       // Get the parallel vector of the line segment
       final parallel = Vector2(o1.dx - o0.dx, o1.dy - o0.dy)..normalize();
-      final perpendicular = Vector2(-parallel.y, parallel.x);
 
       while (distance < totalDistance) {
         final f1 = distance / totalDistance;
@@ -357,18 +352,18 @@ class PolylinePainter extends CustomPainter {
         );
         final dashOffset = offset + shift;
 
-        // Create a rectangular path
+        // Create a path for the dash
         final dashPath = ui.Path()
-          ..moveTo(
-            dashOffset.dx - perpendicular.x * strokeWidth / 2,
-            dashOffset.dy - perpendicular.y * strokeWidth / 2,
-          )
-          ..lineTo(
-            dashOffset.dx + perpendicular.x * strokeWidth / 2 + parallel.x * normalizedDashWidth,
-            dashOffset.dy + perpendicular.y * strokeWidth / 2 + parallel.y * normalizedDashWidth,
-          );
+          ..moveTo(dashOffset.dx - parallel.x * normalizedDashWidth / 2,
+              dashOffset.dy - parallel.y * normalizedDashWidth / 2)
+          ..lineTo(dashOffset.dx + parallel.x * normalizedDashWidth / 2,
+              dashOffset.dy + parallel.y * normalizedDashWidth / 2);
 
-        // Draw the path
+        // Set the stroke width and stroke cap for the paint
+        paint.strokeWidth = strokeWidth;
+        paint.strokeCap = StrokeCap.butt;
+
+        // Draw the dash
         canvas.drawPath(dashPath, paint);
 
         distance += normalizedDashWidth + normalizedDashGap;
