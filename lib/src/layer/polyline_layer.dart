@@ -343,7 +343,8 @@ class PolylinePainter extends CustomPainter {
       final vector = Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
       final unitVector = vector.normalized();
 
-      while (distance < totalDistance) {
+      while (distance < totalDistance - normalizedDashWidth) {
+        // subtract normalizedDashWidth to avoid overlapping dashes
         final f1 = (distance + normalizedDashWidth) / totalDistance;
         final f0 = distance / totalDistance;
         final startOffset = Offset(o0.dx * f0 + o1.dx * (1 - f0), o0.dy * f0 + o1.dy * (1 - f0));
