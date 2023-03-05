@@ -364,7 +364,7 @@ class PolylinePainter extends CustomPainter {
         final dashPath = ui.Path()
           ..moveTo(startPoint.dx, startPoint.dy)
           ..lineTo(endPoint.dx, endPoint.dy);
-        dashedPath.addPath(dashPath, Offset.zero);
+        path.addPath(dashPath, Offset.zero);
 
         distance += strokeWidth + normalizedDashGap;
       }
