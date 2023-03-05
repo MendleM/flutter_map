@@ -352,12 +352,12 @@ class PolylinePainter extends CustomPainter {
 
         // Calculate the start and end points of the dash
         final startPoint = Offset(
-          startOffset.dx + (normalizedDashWidth / 2 - normalizedDashGap / 2) * unitVector.x,
-          startOffset.dy + (normalizedDashWidth / 2 - normalizedDashGap / 2) * unitVector.y,
+          startOffset.dx + (normalizedDashWidth / 2 - normalizedDashGap) * unitVector.x,
+          startOffset.dy + (normalizedDashWidth / 2 - normalizedDashGap) * unitVector.y,
         );
         final endPoint = Offset(
-          endOffset.dx - (normalizedDashWidth / 2 - normalizedDashGap / 2) * unitVector.x,
-          endOffset.dy - (normalizedDashWidth / 2 - normalizedDashGap / 2) * unitVector.y,
+          endOffset.dx - (normalizedDashWidth / 2 - normalizedDashGap) * unitVector.x,
+          endOffset.dy - (normalizedDashWidth / 2 - normalizedDashGap) * unitVector.y,
         );
 
         // Set the stroke width and stroke cap for the paint
