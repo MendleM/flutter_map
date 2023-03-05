@@ -333,6 +333,9 @@ class PolylinePainter extends CustomPainter {
     final double normalizedDashWidth = dashWidth * strokeWidth;
     final double normalizedDashGap = dashGap * strokeWidth;
 
+    paint.strokeJoin = StrokeJoin.miter;
+    paint.strokeCap = StrokeCap.round;
+
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
