@@ -363,8 +363,7 @@ class PolylinePainter extends CustomPainter {
         paint.strokeWidth = strokeWidth;
         paint.strokeCap = StrokeCap.butt;
 
-        // Draw the dash
-        canvas.drawPath(dashPath, paint);
+        path.addPath(dashPath, dashOffset);
 
         distance += normalizedDashWidth + normalizedDashGap;
       }
