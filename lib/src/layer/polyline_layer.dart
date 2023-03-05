@@ -265,8 +265,7 @@ class PolylinePainter extends CustomPainter {
             strokeWidth,
             polyline.dashLength,
             polyline.dashGap,
-            canvas,
-            paint,
+            zoom,
           );
           _paintDashedLine(
             filterPath,
@@ -274,8 +273,7 @@ class PolylinePainter extends CustomPainter {
             strokeWidth,
             polyline.dashLength,
             polyline.dashGap,
-            canvas,
-            paint,
+            zoom,
           );
         }
         _paintDashedLine(
@@ -284,8 +282,7 @@ class PolylinePainter extends CustomPainter {
           strokeWidth,
           polyline.dashLength,
           polyline.dashGap,
-          canvas,
-          paint,
+          zoom,
         );
       } else {
         if (borderPaint != null && filterPaint != null) {
@@ -327,13 +324,12 @@ class PolylinePainter extends CustomPainter {
     double strokeWidth,
     double dashLength,
     double dashGap,
-    Canvas canvas,
-    Paint paint,
+    double zoom,
   ) {
     final double normalizedDashGap = dashGap * strokeWidth;
     final double normalizedDashLength = dashLength * strokeWidth;
 
-    print('normalizedDashGap: $normalizedDashGap - normalizedDashLength: $normalizedDashLength');
+    print('zoom: $zoom');
 
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
