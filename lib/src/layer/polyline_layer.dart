@@ -1,12 +1,11 @@
-import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart' show Float64List, kIsWeb;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/map/flutter_map_state.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:vector_math/vector_math.dart' as vmath;
+import 'package:vector_math/vector_math.dart';
 
 class Polyline {
   final List<LatLng> points;
@@ -216,7 +215,7 @@ class PolylinePainter extends CustomPainter {
         ..strokeWidth = strokeWidth
         ..strokeCap = polyline.strokeCap
         ..strokeJoin = polyline.strokeJoin
-        ..style = isDotted || isDashed ? PaintingStyle.fill : PaintingStyle.stroke
+        ..style = isDotted ? PaintingStyle.fill : PaintingStyle.stroke
         ..blendMode = BlendMode.srcOver;
 
       if (polyline.gradientColors == null) {
@@ -336,7 +335,7 @@ class PolylinePainter extends CustomPainter {
       double distance = strokeWidth / 2;
 
       // Get the unit vector in the direction of the line segment
-      final vector = vmath.Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
+      final vector = Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
       final unitVector = vector.normalized();
 
       while (distance < totalDistance - strokeWidth) {
@@ -356,42 +355,10 @@ class PolylinePainter extends CustomPainter {
           endOffset.dy - (strokeWidth / 2) * unitVector.y,
         );
 
-        // Calculate the angle between the unit vector and the x-axis
-        final angle = atan2(unitVector.y, unitVector.x);
-
-        // Calculate the dimensions of the rounded rectangle
-        final rectWidth = endPoint.dx - startPoint.dx;
-        final rectHeight = strokeWidth;
-        final rectRadius = rectHeight / 2;
-
-        // Calculate the position of the center of the rounded rectangle
-        final rectCenter = Offset(
-          startPoint.dx + rectWidth / 2,
-          startPoint.dy + rectHeight / 2,
-        );
-
-        // Create the rounded rectangle path
-        final dashPath = ui.Path()
-          ..addRRect(
-            RRect.fromRectAndRadius(
-              Rect.fromCenter(
-                center: rectCenter,
-                width: rectWidth,
-                height: rectHeight,
-              ),
-              Radius.circular(rectRadius),
-            ),
-          );
-
-        final matrix = Matrix4(zoom, 0, 0, 0, 0, zoom, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
-          ..translate(rectCenter.dx, rectCenter.dy)
-          ..rotateZ(angle)
-          ..translate(-rectCenter.dx, -rectCenter.dy);
-
-        // Rotate the path to align with the line segment
-        dashPath.transform(Float64List.fromList(matrix.storage));
-
         // Add the dash to the dashedPath object
+        final dashPath = ui.Path()
+          ..moveTo(startPoint.dx, startPoint.dy)
+          ..lineTo(endPoint.dx, endPoint.dy);
         path.addPath(dashPath, Offset.zero);
 
         distance += strokeWidth + normalizedDashGap;
