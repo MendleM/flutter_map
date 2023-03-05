@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -314,18 +315,24 @@ class PolylinePainter extends CustomPainter {
       print("totalDistance: $totalDistance");
       double distance = 0;
 
-      // method to add dashes along path with dashes of length normalizedDashWidth and gaps of length normalizedDashGap between o0 and o1 and along the angle of the path
+      // method to add dashes as rounded rectangles along path with offsets o0 and o1 with dashes of length normalizedDashWidth and gaps of length normalizedDashGap the rounded rectangles should be on a diagonal along the angle of the line
       while (distance < totalDistance) {
         final f1 = distance / totalDistance;
         final f0 = 1.0 - f1;
         final offset = Offset(o0.dx * f0 + o1.dx * f1, o0.dy * f0 + o1.dy * f1);
-        final nextDistance = distance + normalizedDashWidth;
-        final nextF1 = nextDistance / totalDistance;
-        final nextF0 = 1.0 - nextF1;
-        final nextOffset = Offset(o0.dx * nextF0 + o1.dx * nextF1, o0.dy * nextF0 + o1.dy * nextF1);
-        path.addRect(Rect.fromPoints(offset, nextOffset));
-
-        distance = nextDistance + normalizedDashGap;
+        final angle = atan2(o1.dy - o0.dy, o1.dx - o0.dx);
+        final angleOffset = Offset(cos(angle), sin(angle));
+        final dashOffset = Offset(
+          offset.dx + angleOffset.dx * normalizedDashWidth / 2,
+          offset.dy + angleOffset.dy * normalizedDashWidth / 2,
+        );
+        final dashRect = Rect.fromCenter(
+          center: dashOffset,
+          width: normalizedDashWidth,
+          height: strokeWidth,
+        );
+        path.addRRect(RRect.fromRectAndRadius(dashRect, Radius.circular(strokeWidth / 2)));
+        distance += normalizedDashWidth + normalizedDashGap;
       }
     }
   }
