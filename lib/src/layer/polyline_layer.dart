@@ -352,22 +352,13 @@ class PolylinePainter extends CustomPainter {
           endOffset.dy - (normalizedDashWidth / 2) * unitVector.y,
         );
 
-        // Calculate the control point for the quadratic Bezier curve
-        final controlPoint = Offset(
-          (startPoint.dx + endPoint.dx) / 2,
-          (startPoint.dy + endPoint.dy) / 2,
-        );
-
         // Set the stroke width and stroke cap for the paint
         paint.strokeWidth = normalizedDashWidth;
         paint.strokeCap = StrokeCap.round;
-        paint.strokeJoin = StrokeJoin.round;
+        paint.strokeJoin = StrokeJoin.miter;
 
         // Draw the dash
-        path.moveTo(startPoint.dx, startPoint.dy);
-        path.quadraticBezierTo(controlPoint.dx, controlPoint.dy, endPoint.dx, endPoint.dy);
-        canvas.drawPath(path, paint);
-        path.reset();
+        canvas.drawLine(startPoint, endPoint, paint);
 
         distance += normalizedDashWidth + normalizedDashGap;
       }
