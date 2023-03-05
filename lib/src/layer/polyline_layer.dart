@@ -335,8 +335,8 @@ class PolylinePainter extends CustomPainter {
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
-      final totalDistance = ((o1 - o0).distance - normalizedDashLength).abs();
-      double distance = normalizedDashLength / 2;
+      final totalDistance = ((o1 - o0).distance - strokeWidth).abs();
+      double distance = strokeWidth / 2;
 
       // Get the unit vector in the direction of the line segment
       final vector = Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
@@ -344,7 +344,7 @@ class PolylinePainter extends CustomPainter {
 
       while (distance < totalDistance - strokeWidth) {
         // subtract normalizedDashWidth to avoid overlapping dashes
-        final f1 = (distance + normalizedDashLength) / totalDistance;
+        final f1 = (distance + strokeWidth) / totalDistance;
         final f0 = distance / totalDistance;
         final startOffset = Offset(o0.dx * f0 + o1.dx * (1 - f0), o0.dy * f0 + o1.dy * (1 - f0));
         final endOffset = Offset(o0.dx * f1 + o1.dx * (1 - f1), o0.dy * f1 + o1.dy * (1 - f1));
@@ -367,7 +367,7 @@ class PolylinePainter extends CustomPainter {
         // Draw the dash
         canvas.drawLine(startPoint, endPoint, paint);
 
-        distance += normalizedDashLength + normalizedDashGap;
+        distance += strokeWidth + normalizedDashGap;
       }
 
       // // Draw half of a dash at the end of the segment if there's a next segment
