@@ -314,32 +314,17 @@ class PolylinePainter extends CustomPainter {
       print("totalDistance: $totalDistance");
       double distance = 0;
 
-      // method to addPath to path with dashes and gaps between o0 and o1
-      void addPath(Offset o0, Offset o1, double distance) {
+      // method to addPath to path with dashes of length normalizedDashWidth and gaps of length normalizedDashGap between o0 and o1
+      while (distance < totalDistance) {
         final f1 = distance / totalDistance;
         final f0 = 1.0 - f1;
         final offset = Offset(o0.dx * f0 + o1.dx * f1, o0.dy * f0 + o1.dy * f1);
-        path.addOval(Rect.fromCircle(center: offset, radius: strokeWidth / 2));
-      }
-
-      while (distance < totalDistance) {
-        if (distance + normalizedDashWidth > totalDistance) {
-          // add dash
-          addPath(o0, o1, distance);
-          distance += normalizedDashWidth;
-        } else {
-          // add dash
-          addPath(o0, o1, distance);
-          distance += normalizedDashWidth;
-
-          if (distance + normalizedDashGap > totalDistance) {
-            // add gap
-            distance += normalizedDashGap;
-          } else {
-            // add gap
-            distance += normalizedDashGap;
-          }
-        }
+        final nextDistance = distance + normalizedDashWidth;
+        final nextF1 = nextDistance / totalDistance;
+        final nextF0 = 1.0 - nextF1;
+        final nextOffset = Offset(o0.dx * nextF0 + o1.dx * nextF1, o0.dy * nextF0 + o1.dy * nextF1);
+        path.addRect(Rect.fromPoints(offset, nextOffset));
+        distance = nextDistance + normalizedDashGap;
       }
     }
   }
