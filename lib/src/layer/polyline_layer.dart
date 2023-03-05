@@ -322,45 +322,44 @@ class PolylinePainter extends CustomPainter {
     Canvas canvas,
     Paint paint,
   ) {
-    final double normalizedDashWidth = strokeWidth;
     final double normalizedDashGap = dashGap * strokeWidth;
 
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
-      final totalDistance = (o1 - o0).distance;
-      double distance = 0;
+      final totalDistance = ((o1 - o0).distance - strokeWidth).abs();
+      double distance = strokeWidth / 2;
 
       // Get the unit vector in the direction of the line segment
       final vector = Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
       final unitVector = vector.normalized();
 
-      while (distance < totalDistance - normalizedDashWidth) {
+      while (distance < totalDistance - strokeWidth) {
         // subtract normalizedDashWidth to avoid overlapping dashes
-        final f1 = (distance + normalizedDashWidth) / totalDistance;
+        final f1 = (distance + strokeWidth) / totalDistance;
         final f0 = distance / totalDistance;
         final startOffset = Offset(o0.dx * f0 + o1.dx * (1 - f0), o0.dy * f0 + o1.dy * (1 - f0));
         final endOffset = Offset(o0.dx * f1 + o1.dx * (1 - f1), o0.dy * f1 + o1.dy * (1 - f1));
 
         // Calculate the start and end points of the dash
         final startPoint = Offset(
-          startOffset.dx + (normalizedDashWidth / 2) * unitVector.x,
-          startOffset.dy + (normalizedDashWidth / 2) * unitVector.y,
+          startOffset.dx + (strokeWidth / 2) * unitVector.x,
+          startOffset.dy + (strokeWidth / 2) * unitVector.y,
         );
         final endPoint = Offset(
-          endOffset.dx - (normalizedDashWidth / 2) * unitVector.x,
-          endOffset.dy - (normalizedDashWidth / 2) * unitVector.y,
+          endOffset.dx - (strokeWidth / 2) * unitVector.x,
+          endOffset.dy - (strokeWidth / 2) * unitVector.y,
         );
 
         // Set the stroke width and stroke cap for the paint
-        paint.strokeWidth = normalizedDashWidth;
+        paint.strokeWidth = strokeWidth;
         paint.strokeCap = StrokeCap.round;
         paint.strokeJoin = StrokeJoin.miter;
 
         // Draw the dash
         canvas.drawLine(startPoint, endPoint, paint);
 
-        distance += normalizedDashWidth + normalizedDashGap;
+        distance += strokeWidth + normalizedDashGap;
       }
 
       // // Draw half of a dash at the end of the segment if there's a next segment
