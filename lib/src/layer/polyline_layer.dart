@@ -339,17 +339,17 @@ class PolylinePainter extends CustomPainter {
       final totalDistance = (o1 - o0).distance;
       double distance = 0;
 
-      // Get the perpendicular vector of the line segment
-      final perpendicular = Vector2(o1.dy - o0.dy, -(o1.dx - o0.dx))..normalize();
-      final angle = perpendicular.angleTo(Vector2(1, 0));
+      // Get the parallel vector of the line segment
+      final parallel = Vector2(o1.dx - o0.dx, o1.dy - o0.dy)..normalize();
+      final angle = parallel.angleTo(Vector2(1, 0));
 
       while (distance < totalDistance) {
         final f1 = distance / totalDistance;
         final f0 = 1.0 - f1;
         final offset = Offset(o0.dx * f0 + o1.dx * f1, o0.dy * f0 + o1.dy * f1);
         final shift = Offset(
-          perpendicular.x * normalizedDashWidth / 2,
-          perpendicular.y * normalizedDashWidth / 2,
+          parallel.x * normalizedDashWidth / 2,
+          parallel.y * normalizedDashWidth / 2,
         );
         final dashOffset = offset + shift;
         canvas.save();
