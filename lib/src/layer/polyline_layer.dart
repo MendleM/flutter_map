@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/map/flutter_map_state.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:vector_math/vector_math.dart';
 
 class Polyline {
   final List<LatLng> points;
@@ -306,25 +307,22 @@ class PolylinePainter extends CustomPainter {
     final double normalizedDashWidth = dashWidth * strokeWidth;
     final double normalizedDashGap = dashGap * strokeWidth;
 
-    print("normalizedDashWidth: $normalizedDashWidth - normalizedDashGap: $normalizedDashGap");
-
     for (var i = 0; i < offsets.length - 2; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
       final totalDistance = (o1 - o0).distance;
-      print("totalDistance: $totalDistance");
       double distance = 0;
 
-      // method to add dashes as rounded rectangles along path with offsets o0 and o1 with dashes of length normalizedDashWidth and gaps of length normalizedDashGap the rounded rectangles should be on a diagonal along the angle of the line
+      // Get the perpendicular vector of the line segment
+      final perpendicular = Vector2(o1.dy - o0.dy, -(o1.dx - o0.dx))..normalize();
+
       while (distance < totalDistance) {
         final f1 = distance / totalDistance;
         final f0 = 1.0 - f1;
         final offset = Offset(o0.dx * f0 + o1.dx * f1, o0.dy * f0 + o1.dy * f1);
-        final angle = atan2(o1.dy - o0.dy, o1.dx - o0.dx);
-        final angleOffset = Offset(cos(angle), sin(angle));
         final dashOffset = Offset(
-          offset.dx + angleOffset.dx * normalizedDashWidth / 2,
-          offset.dy + angleOffset.dy * normalizedDashWidth / 2,
+          offset.dx + perpendicular.x * normalizedDashWidth / 2,
+          offset.dy + perpendicular.y * normalizedDashWidth / 2,
         );
         final dashRect = Rect.fromCenter(
           center: dashOffset,
