@@ -360,32 +360,37 @@ class PolylinePainter extends CustomPainter {
           endOffset.dy - (strokeWidth / 2) * unitVector.y,
         );
 
-        // Set the stroke width and stroke cap for the paint
-        paint.strokeWidth = strokeWidth;
-        paint.strokeMiterLimit = 10;
-        paint.strokeCap = StrokeCap.round;
-        paint.strokeJoin = StrokeJoin.miter;
-
-        // Draw the dash
-        canvas.drawLine(startPoint, endPoint, paint);
+        // Add the dash to the dashedPath object
+        final dashPath = ui.Path()
+          ..moveTo(startPoint.dx, startPoint.dy)
+          ..lineTo(endPoint.dx, endPoint.dy);
+        dashedPath.addPath(dashPath, Offset.zero);
 
         distance += strokeWidth + normalizedDashGap;
       }
 
-      // // Draw half of a dash at the end of the segment if there's a next segment
-      // if (i < offsets.length - 2) {
-      //   final nextVector = Vector2(offsets[i + 2].dx - o1.dx, offsets[i + 2].dy - o1.dy);
-      //   final nextUnitVector = nextVector.normalized();
-      //   final endPoint = Offset(
-      //     o1.dx + (normalizedDashWidth / 2) * nextUnitVector.x,
-      //     o1.dy + (normalizedDashWidth / 2) * nextUnitVector.y,
-      //   );
-      //   final startPoint = Offset(
-      //     endPoint.dx - normalizedDashWidth * nextUnitVector.x,
-      //     endPoint.dy - normalizedDashWidth * nextUnitVector.y,
-      //   );
-      //   canvas.drawLine(startPoint, endPoint, paint);
-      // }
+      // Draw half of a dash at the end of the segment if there's a next segment
+      if (i < offsets.length - 2) {
+        final nextVector = Vector2(offsets[i + 2].dx - o1.dx, offsets[i + 2].dy - o1.dy);
+        final nextUnitVector = nextVector.normalized();
+        final endPoint = Offset(
+          o1.dx + (normalizedDashLength / 2) * nextUnitVector.x,
+          o1.dy + (normalizedDashLength / 2) * nextUnitVector.y,
+        );
+        final startPoint = Offset(
+          endPoint.dx - normalizedDashLength * nextUnitVector.x,
+          endPoint.dy - normalizedDashLength * nextUnitVector.y,
+        );
+
+        // Add the end dash to the dashedPath object
+        final dashPath = ui.Path()
+          ..moveTo(startPoint.dx, startPoint.dy)
+          ..lineTo(endPoint.dx, endPoint.dy);
+
+        path.addPath(dashPath, Offset.zero);
+
+        distance += normalizedDashLength;
+      }
     }
   }
 
