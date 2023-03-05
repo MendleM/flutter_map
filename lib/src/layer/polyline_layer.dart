@@ -50,6 +50,7 @@ class Polyline {
   /// Used to batch draw calls to the canvas.
   int get renderHashCode => Object.hash(
         strokeWidth,
+        dashLength,
         dashGap,
         color,
         borderStrokeWidth,
