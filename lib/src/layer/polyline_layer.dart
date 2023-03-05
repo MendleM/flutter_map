@@ -323,7 +323,16 @@ class PolylinePainter extends CustomPainter {
         final nextF1 = nextDistance / totalDistance;
         final nextF0 = 1.0 - nextF1;
         final nextOffset = Offset(o0.dx * nextF0 + o1.dx * nextF1, o0.dy * nextF0 + o1.dy * nextF1);
-        path.addRect(Rect.fromPoints(offset, nextOffset));
+        // Add line to path with rounded caps
+        path.addRRect(
+          RRect.fromLTRBR(
+            offset.dx,
+            offset.dy,
+            nextOffset.dx,
+            nextOffset.dy,
+            Radius.circular(normalizedDashWidth / 2),
+          ),
+        );
         distance = nextDistance + normalizedDashGap;
       }
     }
