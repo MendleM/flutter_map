@@ -333,9 +333,6 @@ class PolylinePainter extends CustomPainter {
     final double normalizedDashWidth = dashWidth * strokeWidth;
     final double normalizedDashGap = dashGap * strokeWidth;
 
-    paint.strokeJoin = StrokeJoin.miter;
-    paint.strokeCap = StrokeCap.round;
-
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
@@ -344,7 +341,7 @@ class PolylinePainter extends CustomPainter {
 
       // Get the parallel vector of the line segment
       final parallel = Vector2(o1.dx - o0.dx, o1.dy - o0.dy)..normalize();
-      final angle = parallel.angleTo(Vector2(1, 0));
+      final perpendicular = Vector2(-parallel.y, parallel.x);
 
       while (distance < totalDistance) {
         final f1 = distance / totalDistance;
@@ -355,19 +352,24 @@ class PolylinePainter extends CustomPainter {
           parallel.y * normalizedDashWidth / 2,
         );
         final dashOffset = offset + shift;
-        canvas.save();
-        canvas.translate(dashOffset.dx, dashOffset.dy);
-        canvas.rotate(angle);
-        canvas.drawRect(
-          Rect.fromLTWH(
-            -normalizedDashWidth / 2,
-            -strokeWidth / 2,
-            normalizedDashWidth,
-            strokeWidth,
-          ),
-          paint,
-        );
-        canvas.restore();
+
+        // Create a rectangular path
+        final rectPath = ui.Path()
+          ..moveTo(dashOffset.dx - perpendicular.x * strokeWidth / 2,
+              dashOffset.dy - perpendicular.y * strokeWidth / 2)
+          ..lineTo(dashOffset.dx + perpendicular.x * strokeWidth / 2,
+              dashOffset.dy + perpendicular.y * strokeWidth / 2)
+          ..lineTo(
+              dashOffset.dx + perpendicular.x * strokeWidth / 2 + parallel.x * normalizedDashWidth,
+              dashOffset.dy + perpendicular.y * strokeWidth / 2 + parallel.y * normalizedDashWidth)
+          ..lineTo(
+              dashOffset.dx - perpendicular.x * strokeWidth / 2 + parallel.x * normalizedDashWidth,
+              dashOffset.dy - perpendicular.y * strokeWidth / 2 + parallel.y * normalizedDashWidth)
+          ..close();
+
+        // Draw the path
+        canvas.drawPath(rectPath, paint);
+
         distance += normalizedDashWidth + normalizedDashGap;
       }
     }
