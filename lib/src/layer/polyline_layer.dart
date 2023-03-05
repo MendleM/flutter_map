@@ -355,6 +355,7 @@ class PolylinePainter extends CustomPainter {
         // Set the stroke width and stroke cap for the paint
         paint.strokeWidth = normalizedDashWidth;
         paint.strokeCap = StrokeCap.round;
+        paint.strokeJoin = StrokeJoin.miter;
 
         // Draw the dash
         canvas.drawLine(startPoint, endPoint, paint);
