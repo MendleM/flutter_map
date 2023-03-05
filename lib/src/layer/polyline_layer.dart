@@ -363,20 +363,20 @@ class PolylinePainter extends CustomPainter {
         distance += normalizedDashWidth + normalizedDashGap;
       }
 
-      // Draw half of a dash at the end of the segment if there's a next segment
-      if (i < offsets.length - 2) {
-        final nextVector = Vector2(offsets[i + 2].dx - o1.dx, offsets[i + 2].dy - o1.dy);
-        final nextUnitVector = nextVector.normalized();
-        final endPoint = Offset(
-          o1.dx + (normalizedDashWidth / 2) * nextUnitVector.x,
-          o1.dy + (normalizedDashWidth / 2) * nextUnitVector.y,
-        );
-        final startPoint = Offset(
-          endPoint.dx - normalizedDashWidth * nextUnitVector.x,
-          endPoint.dy - normalizedDashWidth * nextUnitVector.y,
-        );
-        canvas.drawLine(startPoint, endPoint, paint);
-      }
+      // // Draw half of a dash at the end of the segment if there's a next segment
+      // if (i < offsets.length - 2) {
+      //   final nextVector = Vector2(offsets[i + 2].dx - o1.dx, offsets[i + 2].dy - o1.dy);
+      //   final nextUnitVector = nextVector.normalized();
+      //   final endPoint = Offset(
+      //     o1.dx + (normalizedDashWidth / 2) * nextUnitVector.x,
+      //     o1.dy + (normalizedDashWidth / 2) * nextUnitVector.y,
+      //   );
+      //   final startPoint = Offset(
+      //     endPoint.dx - normalizedDashWidth * nextUnitVector.x,
+      //     endPoint.dy - normalizedDashWidth * nextUnitVector.y,
+      //   );
+      //   canvas.drawLine(startPoint, endPoint, paint);
+      // }
     }
   }
 
