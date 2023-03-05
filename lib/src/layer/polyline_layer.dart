@@ -1,11 +1,12 @@
+import 'dart:math';
 import 'dart:ui' as ui;
 
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show Float64List, kIsWeb;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/src/map/flutter_map_state.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:vector_math/vector_math.dart';
+import 'package:vector_math/vector_math.dart' as vmath;
 
 class Polyline {
   final List<LatLng> points;
@@ -327,7 +328,6 @@ class PolylinePainter extends CustomPainter {
     double zoom,
   ) {
     final double normalizedDashGap = dashGap * strokeWidth;
-    final double normalizedDashLength = dashLength * strokeWidth;
 
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
@@ -336,7 +336,7 @@ class PolylinePainter extends CustomPainter {
       double distance = strokeWidth / 2;
 
       // Get the unit vector in the direction of the line segment
-      final vector = Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
+      final vector = vmath.Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
       final unitVector = vector.normalized();
 
       while (distance < totalDistance - strokeWidth) {
@@ -348,44 +348,53 @@ class PolylinePainter extends CustomPainter {
 
         // Calculate the start and end points of the dash
         final startPoint = Offset(
-          (startOffset.dx + (strokeWidth / 2) * unitVector.x).roundToDouble(),
-          (startOffset.dy + (strokeWidth / 2) * unitVector.y).roundToDouble(),
+          startOffset.dx + (strokeWidth / 2) * unitVector.x,
+          startOffset.dy + (strokeWidth / 2) * unitVector.y,
         );
         final endPoint = Offset(
-          (endOffset.dx - (strokeWidth / 2) * unitVector.x).roundToDouble(),
-          (endOffset.dy - (strokeWidth / 2) * unitVector.y).roundToDouble(),
+          endOffset.dx - (strokeWidth / 2) * unitVector.x,
+          endOffset.dy - (strokeWidth / 2) * unitVector.y,
         );
 
-        // Add the dash to the dashedPath object
+        // Calculate the angle between the unit vector and the x-axis
+        final angle = atan2(unitVector.y, unitVector.x);
+
+        // Calculate the dimensions of the rounded rectangle
+        final rectWidth = endPoint.dx - startPoint.dx;
+        final rectHeight = strokeWidth;
+        final rectRadius = rectHeight / 2;
+
+        // Calculate the position of the center of the rounded rectangle
+        final rectCenter = Offset(
+          startPoint.dx + rectWidth / 2,
+          startPoint.dy + rectHeight / 2,
+        );
+
+        // Create the rounded rectangle path
         final dashPath = ui.Path()
-          ..moveTo(startPoint.dx, startPoint.dy)
-          ..lineTo(endPoint.dx, endPoint.dy);
+          ..addRRect(
+            RRect.fromRectAndRadius(
+              Rect.fromCenter(
+                center: rectCenter,
+                width: rectWidth,
+                height: rectHeight,
+              ),
+              Radius.circular(rectRadius),
+            ),
+          );
+
+        final matrix = Matrix4(zoom, 0, 0, 0, 0, zoom, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+          ..translate(rectCenter.dx, rectCenter.dy)
+          ..rotateZ(angle)
+          ..translate(-rectCenter.dx, -rectCenter.dy);
+
+        // Rotate the path to align with the line segment
+        dashPath.transform(Float64List.fromList(matrix.storage));
+
+        // Add the dash to the dashedPath object
         path.addPath(dashPath, Offset.zero);
 
         distance += strokeWidth + normalizedDashGap;
-      }
-
-      // Draw half of a dash at the end of the segment if there's a next segment
-      if (i < offsets.length - 2) {
-        final nextVector = Vector2(offsets[i + 2].dx - o1.dx, offsets[i + 2].dy - o1.dy);
-        final nextUnitVector = nextVector.normalized();
-        final endPoint = Offset(
-          o1.dx + (normalizedDashLength / 2) * nextUnitVector.x,
-          o1.dy + (normalizedDashLength / 2) * nextUnitVector.y,
-        );
-        final startPoint = Offset(
-          endPoint.dx - normalizedDashLength * nextUnitVector.x,
-          endPoint.dy - normalizedDashLength * nextUnitVector.y,
-        );
-
-        // Add the end dash to the dashedPath object
-        final dashPath = ui.Path()
-          ..moveTo(startPoint.dx, startPoint.dy)
-          ..lineTo(endPoint.dx, endPoint.dy);
-
-        path.addPath(dashPath, Offset.zero);
-
-        distance += normalizedDashLength;
       }
     }
   }
