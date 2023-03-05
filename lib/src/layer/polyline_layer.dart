@@ -307,14 +307,12 @@ class PolylinePainter extends CustomPainter {
     final double normalizedDashWidth = dashWidth * strokeWidth;
     final double normalizedDashGap = dashGap * strokeWidth;
 
-    for (var i = 0; i < offsets.length - 2; i++) {
+    for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
       final totalDistance = (o1 - o0).distance;
-      double distance = 0;
-
-      // Get the perpendicular vector of the line segment
       final perpendicular = Vector2(o1.dy - o0.dy, -(o1.dx - o0.dx))..normalize();
+      double distance = 0;
 
       while (distance < totalDistance) {
         final f1 = distance / totalDistance;
