@@ -259,10 +259,34 @@ class PolylinePainter extends CustomPainter {
         _paintDottedLine(path, offsets, radius, spacing);
       } else if (isDashed) {
         if (borderPaint != null && filterPaint != null) {
-          _paintDashedLine(borderPath, offsets, polyline.dashWidth, polyline.dashGap, strokeWidth);
-          _paintDashedLine(filterPath, offsets, polyline.dashWidth, polyline.dashGap, strokeWidth);
+          _paintDashedLine(
+            borderPath,
+            offsets,
+            polyline.dashWidth,
+            polyline.dashGap,
+            strokeWidth,
+            canvas,
+            paint,
+          );
+          _paintDashedLine(
+            filterPath,
+            offsets,
+            polyline.dashWidth,
+            polyline.dashGap,
+            strokeWidth,
+            canvas,
+            paint,
+          );
         }
-        _paintDashedLine(path, offsets, polyline.dashWidth, polyline.dashGap, strokeWidth);
+        _paintDashedLine(
+          path,
+          offsets,
+          polyline.dashWidth,
+          polyline.dashGap,
+          strokeWidth,
+          canvas,
+          paint,
+        );
       } else {
         if (borderPaint != null && filterPaint != null) {
           _paintLine(borderPath, offsets);
@@ -303,6 +327,8 @@ class PolylinePainter extends CustomPainter {
     double dashWidth,
     double dashGap,
     double strokeWidth,
+    Canvas canvas,
+    Paint paint,
   ) {
     final double normalizedDashWidth = dashWidth * strokeWidth;
     final double normalizedDashGap = dashGap * strokeWidth;
@@ -311,24 +337,34 @@ class PolylinePainter extends CustomPainter {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
       final totalDistance = (o1 - o0).distance;
-      final perpendicular = Vector2(o1.dy - o0.dy, -(o1.dx - o0.dx))..normalize();
       double distance = 0;
+
+      // Get the perpendicular vector of the line segment
+      final perpendicular = Vector2(o1.dy - o0.dy, -(o1.dx - o0.dx))..normalize();
+      final angle = perpendicular.angleTo(Vector2(1, 0));
 
       while (distance < totalDistance) {
         final f1 = distance / totalDistance;
         final f0 = 1.0 - f1;
         final offset = Offset(o0.dx * f0 + o1.dx * f1, o0.dy * f0 + o1.dy * f1);
-        final dashOffset = Offset(
-          offset.dx + perpendicular.x * normalizedDashWidth / 2,
-          offset.dy + perpendicular.y * normalizedDashWidth / 2,
+        final shift = Offset(
+          perpendicular.x * normalizedDashWidth / 2,
+          perpendicular.y * normalizedDashWidth / 2,
         );
-        final angle = atan2(o1.dy - o0.dy, o1.dx - o0.dx);
-        final dashRect = Rect.fromCenter(
-          center: dashOffset,
-          width: normalizedDashWidth,
-          height: strokeWidth,
-        ).shift(Offset(normalizedDashWidth / 2 * cos(angle), normalizedDashWidth / 2 * sin(angle)));
-        path.addRRect(RRect.fromRectAndRadius(dashRect, Radius.circular(strokeWidth / 2)));
+        final dashOffset = offset + shift;
+        canvas.save();
+        canvas.translate(dashOffset.dx, dashOffset.dy);
+        canvas.rotate(angle);
+        canvas.drawRect(
+          Rect.fromLTWH(
+            -normalizedDashWidth / 2,
+            -strokeWidth / 2,
+            normalizedDashWidth,
+            strokeWidth,
+          ),
+          paint,
+        );
+        canvas.restore();
         distance += normalizedDashWidth + normalizedDashGap;
       }
     }
