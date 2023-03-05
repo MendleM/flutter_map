@@ -314,33 +314,32 @@ class PolylinePainter extends CustomPainter {
       print("totalDistance: $totalDistance");
       double distance = 0;
 
-      while (distance < totalDistance) {
+      // method to addPath to path with dashes and gaps between o0 and o1
+      void addPath(Offset o0, Offset o1, double distance) {
         final f1 = distance / totalDistance;
         final f0 = 1.0 - f1;
         final offset = Offset(o0.dx * f0 + o1.dx * f1, o0.dy * f0 + o1.dy * f1);
-        final dashStart = distance - normalizedDashWidth / 2;
-        final dashEnd = distance + normalizedDashWidth / 2;
+        path.addOval(Rect.fromCircle(center: offset, radius: strokeWidth / 2));
+      }
 
-        print("f0: $f0 - f1: $f1");
-        print("dashStart: $dashStart - dashEnd: $dashEnd");
-        print("offset.dx: ${offset.dx} - offset.dy: ${offset.dy}");
+      while (distance < totalDistance) {
+        if (distance + normalizedDashWidth > totalDistance) {
+          // add dash
+          addPath(o0, o1, distance);
+          distance += normalizedDashWidth;
+        } else {
+          // add dash
+          addPath(o0, o1, distance);
+          distance += normalizedDashWidth;
 
-        path.addPath(
-          ui.Path()
-            ..moveTo(
-              offset.dx + (dashStart < 0 ? 0 : dashStart),
-              offset.dy + (dashStart < 0 ? 0 : dashStart),
-            )
-            ..lineTo(
-              offset.dx + (dashEnd > totalDistance ? totalDistance - dashEnd : 0),
-              offset.dy + (dashEnd > totalDistance ? totalDistance - dashEnd : 0),
-            ),
-          o0,
-        );
-
-        distance += normalizedDashWidth + normalizedDashGap;
-
-        print("new distance: $distance");
+          if (distance + normalizedDashGap > totalDistance) {
+            // add gap
+            distance += normalizedDashGap;
+          } else {
+            // add gap
+            distance += normalizedDashGap;
+          }
+        }
       }
     }
   }
