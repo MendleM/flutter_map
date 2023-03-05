@@ -333,6 +333,8 @@ class PolylinePainter extends CustomPainter {
     final double normalizedDashGap = dashGap * strokeWidth;
     final double normalizedDashLength = dashLength * strokeWidth;
 
+    print('normalizedDashGap: $normalizedDashGap - normalizedDashLength: $normalizedDashLength');
+
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
