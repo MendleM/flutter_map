@@ -327,41 +327,51 @@ class PolylinePainter extends CustomPainter {
     double zoom,
   ) {
     final double normalizedDashGap = dashGap * strokeWidth;
+    final double totalDashLength = dashLength + normalizedDashGap;
 
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
-      final totalDistance = ((o1 - o0).distance - strokeWidth).abs();
-      double distance = strokeWidth / 2;
+      final totalDistance = ((o1 - o0).distance).abs();
+      final numDashes = (totalDistance / totalDashLength).floor();
+
+      // Calculate the start and end points of the line segment
+      final startPoint = Offset(o0.dx, o0.dy);
+      final endPoint = Offset(o1.dx, o1.dy);
 
       // Get the unit vector in the direction of the line segment
       final vector = Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
       final unitVector = vector.normalized();
 
-      while (distance < totalDistance - strokeWidth) {
-        // subtract normalizedDashWidth to avoid overlapping dashes
-        final f1 = (distance + strokeWidth) / totalDistance;
-        final f0 = distance / totalDistance;
+      // Calculate the distance from the start of the line segment to the first dash
+      final distanceToFirstDash =
+          (strokeWidth / 2) - (totalDistance - (numDashes * totalDashLength)) / 2;
+
+      double distance = distanceToFirstDash;
+
+      for (var j = 0; j < numDashes; j++) {
+        final f0 = (distance - (strokeWidth / 2)) / totalDistance;
+        final f1 = (distance + dashLength + (strokeWidth / 2)) / totalDistance;
         final startOffset = Offset(o0.dx * f0 + o1.dx * (1 - f0), o0.dy * f0 + o1.dy * (1 - f0));
         final endOffset = Offset(o0.dx * f1 + o1.dx * (1 - f1), o0.dy * f1 + o1.dy * (1 - f1));
 
         // Calculate the start and end points of the dash
-        final startPoint = Offset(
+        final dashStart = Offset(
           startOffset.dx + (strokeWidth / 2) * unitVector.x,
           startOffset.dy + (strokeWidth / 2) * unitVector.y,
         );
-        final endPoint = Offset(
+        final dashEnd = Offset(
           endOffset.dx - (strokeWidth / 2) * unitVector.x,
           endOffset.dy - (strokeWidth / 2) * unitVector.y,
         );
 
         // Add the dash to the dashedPath object
         final dashPath = ui.Path()
-          ..moveTo(startPoint.dx, startPoint.dy)
-          ..lineTo(endPoint.dx, endPoint.dy);
+          ..moveTo(dashStart.dx, dashStart.dy)
+          ..lineTo(dashEnd.dx, dashEnd.dy);
         path.addPath(dashPath, Offset.zero);
 
-        distance += strokeWidth + normalizedDashGap;
+        distance += totalDashLength;
       }
     }
   }
