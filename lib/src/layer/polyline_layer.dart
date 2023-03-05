@@ -214,8 +214,7 @@ class PolylinePainter extends CustomPainter {
         ..strokeWidth = strokeWidth
         ..strokeCap = polyline.strokeCap
         ..strokeJoin = polyline.strokeJoin
-        ..style = isDotted || isDashed ? PaintingStyle.fill : PaintingStyle.stroke
-        ..isAntiAlias = false
+        ..style = isDotted ? PaintingStyle.fill : PaintingStyle.stroke
         ..blendMode = BlendMode.srcOver;
 
       if (polyline.gradientColors == null) {
@@ -232,7 +231,7 @@ class PolylinePainter extends CustomPainter {
           ..strokeWidth = strokeWidth
           ..strokeCap = polyline.strokeCap
           ..strokeJoin = polyline.strokeJoin
-          ..style = isDotted || isDashed ? PaintingStyle.fill : PaintingStyle.stroke
+          ..style = isDotted ? PaintingStyle.fill : PaintingStyle.stroke
           ..blendMode = BlendMode.dstOut;
       }
 
@@ -242,7 +241,7 @@ class PolylinePainter extends CustomPainter {
           ..strokeWidth = strokeWidth + polyline.borderStrokeWidth
           ..strokeCap = polyline.strokeCap
           ..strokeJoin = polyline.strokeJoin
-          ..style = isDotted || isDashed ? PaintingStyle.fill : PaintingStyle.stroke
+          ..style = isDotted ? PaintingStyle.fill : PaintingStyle.stroke
           ..blendMode = BlendMode.srcOver;
       }
 
