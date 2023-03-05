@@ -339,31 +339,32 @@ class PolylinePainter extends CustomPainter {
       final totalDistance = (o1 - o0).distance;
       double distance = 0;
 
-      // Get the parallel vector of the line segment
-      final parallel = Vector2(o1.dx - o0.dx, o1.dy - o0.dy)..normalize();
+      // Get the unit vector in the direction of the line segment
+      final vector = Vector2(o1.dx - o0.dx, o1.dy - o0.dy);
+      final unitVector = vector.normalized();
 
       while (distance < totalDistance) {
-        final f1 = distance / totalDistance;
-        final f0 = 1.0 - f1;
-        final offset = Offset(o0.dx * f0 + o1.dx * f1, o0.dy * f0 + o1.dy * f1);
-        final shift = Offset(
-          parallel.x * normalizedDashWidth / 2,
-          parallel.y * normalizedDashWidth / 2,
-        );
-        final dashOffset = offset + shift;
+        final f1 = (distance + normalizedDashWidth) / totalDistance;
+        final f0 = distance / totalDistance;
+        final startOffset = Offset(o0.dx * f0 + o1.dx * (1 - f0), o0.dy * f0 + o1.dy * (1 - f0));
+        final endOffset = Offset(o0.dx * f1 + o1.dx * (1 - f1), o0.dy * f1 + o1.dy * (1 - f1));
 
-        // Create a path for the dash
-        final dashPath = ui.Path()
-          ..moveTo(dashOffset.dx - parallel.x * normalizedDashWidth / 2,
-              dashOffset.dy - parallel.y * normalizedDashWidth / 2)
-          ..lineTo(dashOffset.dx + parallel.x * normalizedDashWidth / 2,
-              dashOffset.dy + parallel.y * normalizedDashWidth / 2);
+        // Calculate the start and end points of the dash
+        final startPoint = Offset(
+          startOffset.dx + (normalizedDashWidth / 2) * unitVector.x,
+          startOffset.dy + (normalizedDashWidth / 2) * unitVector.y,
+        );
+        final endPoint = Offset(
+          endOffset.dx - (normalizedDashWidth / 2) * unitVector.x,
+          endOffset.dy - (normalizedDashWidth / 2) * unitVector.y,
+        );
 
         // Set the stroke width and stroke cap for the paint
         paint.strokeWidth = strokeWidth;
-        paint.strokeCap = StrokeCap.butt;
+        paint.strokeCap = StrokeCap.round;
 
-        path.addPath(dashPath, dashOffset);
+        // Draw the dash
+        canvas.drawLine(startPoint, endPoint, paint);
 
         distance += normalizedDashWidth + normalizedDashGap;
       }
