@@ -216,7 +216,7 @@ class PolylinePainter extends CustomPainter {
         ..strokeWidth = strokeWidth
         ..strokeCap = polyline.strokeCap
         ..strokeJoin = polyline.strokeJoin
-        ..style = isDotted ? PaintingStyle.fill : PaintingStyle.stroke
+        ..style = isDotted || isDashed ? PaintingStyle.fill : PaintingStyle.stroke
         ..blendMode = BlendMode.srcOver;
 
       if (polyline.gradientColors == null) {
