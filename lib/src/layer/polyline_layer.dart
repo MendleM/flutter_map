@@ -370,8 +370,7 @@ class PolylinePainter extends CustomPainter {
               dashOffset.dy - perpendicular.y * strokeWidth / 2 + parallel.y * normalizedDashWidth)
           ..close();
 
-        // Draw the path
-        canvas.drawPath(rectPath, paint);
+        path.addPath(rectPath, dashOffset);
 
         distance += normalizedDashWidth + normalizedDashGap;
       }
