@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -21,7 +20,6 @@ class Polyline {
   final StrokeCap strokeCap;
   final StrokeJoin strokeJoin;
   final bool useStrokeWidthInMeter;
-  final double dashWidth;
   final double dashGap;
 
   LatLngBounds? _boundingBox;
@@ -33,7 +31,6 @@ class Polyline {
   Polyline({
     required this.points,
     this.strokeWidth = 1.0,
-    this.dashWidth = 4.0,
     this.dashGap = 3.0,
     this.color = const Color(0xFF00FF00),
     this.borderStrokeWidth = 0.0,
@@ -50,7 +47,6 @@ class Polyline {
   /// Used to batch draw calls to the canvas.
   int get renderHashCode => Object.hash(
         strokeWidth,
-        dashWidth,
         dashGap,
         color,
         borderStrokeWidth,
@@ -262,18 +258,16 @@ class PolylinePainter extends CustomPainter {
           _paintDashedLine(
             borderPath,
             offsets,
-            polyline.dashWidth,
-            polyline.dashGap,
             strokeWidth,
+            polyline.dashGap,
             canvas,
             paint,
           );
           _paintDashedLine(
             filterPath,
             offsets,
-            polyline.dashWidth,
-            polyline.dashGap,
             strokeWidth,
+            polyline.dashGap,
             canvas,
             paint,
           );
@@ -281,9 +275,8 @@ class PolylinePainter extends CustomPainter {
         _paintDashedLine(
           path,
           offsets,
-          polyline.dashWidth,
-          polyline.dashGap,
           strokeWidth,
+          polyline.dashGap,
           canvas,
           paint,
         );
@@ -324,13 +317,12 @@ class PolylinePainter extends CustomPainter {
   void _paintDashedLine(
     ui.Path path,
     List<Offset> offsets,
-    double dashWidth,
-    double dashGap,
     double strokeWidth,
+    double dashGap,
     Canvas canvas,
     Paint paint,
   ) {
-    final double normalizedDashWidth = dashWidth * strokeWidth;
+    final double normalizedDashWidth = strokeWidth;
     final double normalizedDashGap = dashGap * strokeWidth;
 
     for (var i = 0; i < offsets.length - 1; i++) {
