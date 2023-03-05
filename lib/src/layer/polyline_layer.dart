@@ -329,8 +329,6 @@ class PolylinePainter extends CustomPainter {
     final double normalizedDashGap = dashGap * strokeWidth;
     final double normalizedDashLength = dashLength * strokeWidth;
 
-    print('zoom: $zoom');
-
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
       final o1 = offsets[i + 1];
@@ -350,12 +348,12 @@ class PolylinePainter extends CustomPainter {
 
         // Calculate the start and end points of the dash
         final startPoint = Offset(
-          startOffset.dx + (strokeWidth / 2) * unitVector.x,
-          startOffset.dy + (strokeWidth / 2) * unitVector.y,
+          (startOffset.dx + (strokeWidth / 2) * unitVector.x).roundToDouble(),
+          (startOffset.dy + (strokeWidth / 2) * unitVector.y).roundToDouble(),
         );
         final endPoint = Offset(
-          endOffset.dx - (strokeWidth / 2) * unitVector.x,
-          endOffset.dy - (strokeWidth / 2) * unitVector.y,
+          (endOffset.dx - (strokeWidth / 2) * unitVector.x).roundToDouble(),
+          (endOffset.dy - (strokeWidth / 2) * unitVector.y).roundToDouble(),
         );
 
         // Add the dash to the dashedPath object
