@@ -322,11 +322,12 @@ class PolylinePainter extends CustomPainter {
           offset.dx + perpendicular.x * normalizedDashWidth / 2,
           offset.dy + perpendicular.y * normalizedDashWidth / 2,
         );
+        final angle = atan2(o1.dy - o0.dy, o1.dx - o0.dx);
         final dashRect = Rect.fromCenter(
           center: dashOffset,
           width: normalizedDashWidth,
           height: strokeWidth,
-        );
+        ).shift(Offset(normalizedDashWidth / 2 * cos(angle), normalizedDashWidth / 2 * sin(angle)));
         path.addRRect(RRect.fromRectAndRadius(dashRect, Radius.circular(strokeWidth / 2)));
         distance += normalizedDashWidth + normalizedDashGap;
       }
