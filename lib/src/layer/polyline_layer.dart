@@ -361,6 +361,7 @@ class PolylinePainter extends CustomPainter {
 
         // Set the stroke width and stroke cap for the paint
         paint.strokeWidth = strokeWidth;
+        paint.strokeMiterLimit = 10;
         paint.strokeCap = StrokeCap.round;
         paint.strokeJoin = StrokeJoin.miter;
 
