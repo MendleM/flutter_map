@@ -314,7 +314,7 @@ class PolylinePainter extends CustomPainter {
       print("totalDistance: $totalDistance");
       double distance = 0;
 
-      // method to addPath to path with dashes of length normalizedDashWidth and gaps of length normalizedDashGap between o0 and o1
+      // method to add dashes along path with dashes of length normalizedDashWidth and gaps of length normalizedDashGap between o0 and o1 and along the angle of the path
       while (distance < totalDistance) {
         final f1 = distance / totalDistance;
         final f0 = 1.0 - f1;
@@ -323,16 +323,8 @@ class PolylinePainter extends CustomPainter {
         final nextF1 = nextDistance / totalDistance;
         final nextF0 = 1.0 - nextF1;
         final nextOffset = Offset(o0.dx * nextF0 + o1.dx * nextF1, o0.dy * nextF0 + o1.dy * nextF1);
-        // Add line to path with rounded caps
-        path.addRRect(
-          RRect.fromLTRBR(
-            offset.dx,
-            offset.dy,
-            nextOffset.dx,
-            nextOffset.dy,
-            Radius.circular(normalizedDashWidth / 2),
-          ),
-        );
+        path.addRect(Rect.fromPoints(offset, nextOffset));
+
         distance = nextDistance + normalizedDashGap;
       }
     }
