@@ -335,7 +335,6 @@ class PolylinePainter extends CustomPainter {
 
     paint.strokeCap = StrokeCap.round;
     paint.strokeJoin = StrokeJoin.miter;
-    paint.strokeWidth = normalizedDashWidth;
 
     for (var i = 0; i < offsets.length - 1; i++) {
       final o0 = offsets[i];
@@ -359,10 +358,14 @@ class PolylinePainter extends CustomPainter {
 
         // Create a rectangular path
         final rectPath = ui.Path()
-          ..moveTo(dashOffset.dx - perpendicular.x * strokeWidth / 2,
-              dashOffset.dy - perpendicular.y * strokeWidth / 2)
-          ..lineTo(dashOffset.dx + perpendicular.x * strokeWidth / 2,
-              dashOffset.dy + perpendicular.y * strokeWidth / 2);
+          ..moveTo(
+            dashOffset.dx - perpendicular.x * strokeWidth / 2,
+            dashOffset.dy - perpendicular.y * strokeWidth / 2,
+          )
+          ..lineTo(
+            dashOffset.dx + perpendicular.x * strokeWidth / 2 + parallel.x * normalizedDashWidth,
+            dashOffset.dy + perpendicular.y * strokeWidth / 2 + parallel.y * normalizedDashWidth,
+          );
 
         // Draw the path
         canvas.drawPath(rectPath, paint);
